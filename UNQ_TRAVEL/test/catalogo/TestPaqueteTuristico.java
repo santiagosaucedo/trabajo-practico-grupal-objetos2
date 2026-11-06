@@ -46,12 +46,15 @@ class TestPaqueteTuristico {
 		when(paqueteMockito.sePuedeReservarCupo()).thenReturn(true);
 		when(paqueteMockito.getCuposTotales()).thenReturn(30);
 		when(paqueteMockito.getCuposReservados()).thenReturn(20);
+		when(paqueteMockito.getCuposLibres()).thenReturn(10);
 		
 		when(servicioMockito.precioBaseCalculado()).thenReturn(500.0);
 		when(servicioMockito.sePuedeQuitarCupo()).thenReturn(true);
 		when(servicioMockito.sePuedeReservarCupo()).thenReturn(true);
 		when(servicioMockito.getCuposTotales()).thenReturn(10);
 		when(servicioMockito.getCuposReservados()).thenReturn(0);
+		when(servicioMockito.getCuposLibres()).thenReturn(10);
+		
 	}
 	
 	
@@ -122,11 +125,13 @@ class TestPaqueteTuristico {
 		
 		assertEquals(paqueteViajeAJujuy.getCuposTotales(), 30);
 		assertEquals(paqueteViajeAJujuy.getCuposReservados(), 20);
+		assertEquals(paqueteViajeAJujuy.getCuposLibres(), 10);
 		
 		paqueteViajeAJujuy.agregarCatalogo(servicioMockito);
 		
 		assertEquals(paqueteViajeAJujuy.getCuposTotales(), 40);
 		assertEquals(paqueteViajeAJujuy.getCuposReservados(), 20);
+		assertEquals(paqueteViajeAJujuy.getCuposLibres(), 20);
 		
 	}
 	

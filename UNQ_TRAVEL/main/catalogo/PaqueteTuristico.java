@@ -109,5 +109,11 @@ public class PaqueteTuristico implements Catalogo {
 		Stream<Catalogo> productos = contenido.stream();
 		return productos.allMatch(producto -> producto.sePuedeQuitarCupo());
 	}
+
+	@Override
+	public int getCuposLibres() {
+		Stream<Catalogo> productos = contenido.stream();
+		return productos.mapToInt(producto -> producto.getCuposLibres()).sum();
+	}
 	
 }

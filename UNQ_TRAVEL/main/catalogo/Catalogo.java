@@ -21,6 +21,8 @@ public interface Catalogo {
 	public int getCuposTotales();
 	
 	public int getCuposReservados();
+	
+	public int getCuposLibres();
 
 	public boolean sePuedeReservarCupo();
 	
