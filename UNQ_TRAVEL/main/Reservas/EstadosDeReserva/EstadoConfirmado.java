@@ -1,4 +1,13 @@
 package Reservas.EstadosDeReserva;
 
-public class EstadoConfirmado {
+import NotificadoresYDocumentos.ObservadorReserva.ObservadorReserva;
+import Reservas.Reserva;
+
+public class EstadoConfirmado extends EstadoDeReserva {
+	
+	
+	@Override
+	public void notificarA(ObservadorReserva observador, Reserva reserva) {
+	    observador.reservaConfirmada(reserva);
+	}
 }

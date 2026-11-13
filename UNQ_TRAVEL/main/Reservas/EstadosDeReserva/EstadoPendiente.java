@@ -1,4 +1,7 @@
 package Reservas.EstadosDeReserva;
 
-public class EstadoPendiente {
+
+
+public class EstadoPendiente extends EstadoDeReserva  {
+	
 }
