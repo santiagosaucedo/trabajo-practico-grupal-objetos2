@@ -1,12 +1,14 @@
 package catalogo;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 
-//No se admiten catalogos duplicados. Es decir, dos mismas estancias de un elemento no pueden existir en una lista de paquetes ni en la
-//lista de un negocio. Ej: ViajeACanarias no puede estar en un paquete turistico dos veces, ya sea de forma directa o dentro de
+//Un paquete no puede tenerse a si mismo dentro ni admitir catalogos duplicados. 
+//Es decir, dos mismas estancias de un elemento no pueden existir en una lista de paquetes.
+//Ej: ViajeACanarias no puede estar en un paquete turistico dos veces, ya sea de forma directa o dentro de
 //otro paquete.
 public class PaqueteTuristico implements Catalogo {
 
@@ -18,13 +20,19 @@ public class PaqueteTuristico implements Catalogo {
 	
 	private String descripcion;
 	
+	//Se toma como "proveedor" aquel que cree el paquete sin importar los proveedores de sus elementos.
 	private String proveedor;
+	
+	private int ventas;
 	
 	
 	public void agregarCatalogo(Catalogo nuevoCatalogo) {
+		if (nuevoCatalogo == this) {
+			throw new RuntimeException ("Un paquete no puede contenerse a si mismo");
+		}
 		contenido.add(nuevoCatalogo);
 	}
-	
+			
 	public PaqueteTuristico(int descuento, String nombre, String descripcion, String proveedor) {
 		if(descuento > 100 || descuento < 0) {
 			throw new RuntimeException ("No es un porcentaje valido");
@@ -57,22 +65,32 @@ public class PaqueteTuristico implements Catalogo {
 	}
 
 	@Override
-	public void decrementarCupo() {
+	public void decrementarCupoConVenta() {
+		this.decrementarCupoSinVenta();
+		ventas = ventas +1;
+	}
+	
+	@Override
+	public void decrementarCupoSinVenta() {
 		if (!this.sePuedeReservarCupo()) {
 			throw new RuntimeException("No pueden reservarse cupos.");
 		}
 		Stream<Catalogo> productos = contenido.stream();
-		productos.forEach(producto -> producto.decrementarCupo());
+		productos.forEach(producto -> producto.decrementarCupoSinVenta());
 	}
 
+	public void liberarCupoConVenta() {
+		this.liberarCupoSinVenta();
+		ventas = ventas - 1;
+	}
+	
 	@Override
-	public void liberarCupo() {
+	public void liberarCupoSinVenta() {
 		if(!this.sePuedeQuitarCupo()) {
 			throw new RuntimeException("No pueden liberarse cupos.");
 		}
 		Stream<Catalogo> productos = contenido.stream();
-		productos.forEach(producto -> producto.liberarCupo());
-		
+		productos.forEach(producto -> producto.liberarCupoSinVenta());
 	}
 
 	@Override
@@ -90,13 +108,12 @@ public class PaqueteTuristico implements Catalogo {
 	@Override
 	public int getCuposTotales() {
 		Stream<Catalogo> productos = contenido.stream();
-		return productos.mapToInt(producto -> producto.getCuposTotales()).sum();
+		return productos.mapToInt(producto -> producto.getCuposTotales()).min()
+				.orElseThrow(()-> new RuntimeException("El paquete esta vacio"));
 	}
-
 	@Override
 	public int getCuposReservados() {
-		Stream<Catalogo> productos = contenido.stream();
-		return productos.mapToInt(producto -> producto.getCuposReservados()).sum();
+		return this.getCuposTotales() - this.getCuposLibres();
 	}
 	
 	public boolean sePuedeReservarCupo() {
@@ -113,7 +130,29 @@ public class PaqueteTuristico implements Catalogo {
 	@Override
 	public int getCuposLibres() {
 		Stream<Catalogo> productos = contenido.stream();
-		return productos.mapToInt(producto -> producto.getCuposLibres()).sum();
+		return productos.mapToInt(producto -> producto.getCuposLibres()).min()
+				.orElseThrow(() -> new RuntimeException("El paquete esta vacio"));
+	}
+	
+	@Override
+	public LocalDate getFecha() {
+		Stream<Catalogo> productos = contenido.stream();
+	    return productos.map(producto -> producto.getFecha()).min((fecha1, fecha2) -> fecha1.compareTo(fecha2))
+	    		.orElseThrow(() -> new RuntimeException("El paquete esta vacio"));
+	}
+
+	@Override
+	public int getVentas() {
+		return ventas;
+	}
+
+	public List<Catalogo> getContenido() {
+		return contenido;
+	}
+	@Override
+	public boolean esDeCategoria(Categoria categoria) {
+		Stream<Catalogo> productos = contenido.stream();
+		return productos.anyMatch(servicio -> servicio.esDeCategoria(categoria));
 	}
 	
 }

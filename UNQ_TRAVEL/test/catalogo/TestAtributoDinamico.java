@@ -45,7 +45,7 @@ class TestAtributoDinamico {
 		
 		assertFalse(aceptanMascotas.esValido());
 		aceptanMascotas.setValor(true);
-		assert(aceptanMascotas).esValido();
+		assertTrue(aceptanMascotas.esValido());
 	}
 	
 }
