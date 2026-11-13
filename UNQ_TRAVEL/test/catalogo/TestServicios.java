@@ -53,6 +53,17 @@ class TestServicios {
 	}
 	
 	@Test
+	void testInstanciamientoInvalidoDePaquete() {
+		assertThrows(RuntimeException.class, () -> new ServicioIndividual ("Hotel A-23", "Noche de hotel A-23", "Hoteles SA",
+				"Estancia de lujo", 500.0, new ArrayList<AtributoDinamico>(List.of(atributoValido)), cupoHotel2, Categoria.ALOJAMIENTO, -1.0));
+		
+		assertThrows(RuntimeException.class, () -> new ServicioIndividual ("Hotel A-23", "Noche de hotel A-23", "Hoteles SA",
+				"Estancia de lujo", 500.0, new ArrayList<AtributoDinamico>(List.of(atributoValido)), cupoHotel2, Categoria.ALOJAMIENTO, 101.0));
+		
+	}
+	
+	
+	@Test
 	void testValidezDeAtributos() {
 		assertFalse(hotelConNullAtributoObligatorio.tieneAtributosObligatoriosAsignados());
 		assertFalse(hotelConAtributoDinamicoNoValido.tieneAtributosAdicionalesAsignados());
@@ -65,23 +76,23 @@ class TestServicios {
 	
 	@Test
 	void testAgregarAtributoDinamico() {
-		assertEquals(hotel.getAtributosAdicionales(), new ArrayList<AtributoDinamico>(List.of(atributoValido)));
+		assertEquals( new ArrayList<AtributoDinamico>(List.of(atributoValido)), hotel.getAtributosAdicionales());
 		hotel.agregarAtributo(atributoValido);
-		assertEquals(hotel.getAtributosAdicionales(), new ArrayList<AtributoDinamico>(List.of(atributoValido, atributoValido)));
+		assertEquals(new ArrayList<AtributoDinamico>(List.of(atributoValido, atributoValido)), hotel.getAtributosAdicionales());
 	}
 
 	@Test
 	void testAccionesSobreCupos() {
 		verify(cupoHotel, times(0)).reservarCupo();
 		verify(cupoHotel, times(0)).quitarCupoReservado();
-		hotel.decrementarCupo();
+		hotel.decrementarCupoConVenta();
 		verify(cupoHotel, times(1)).reservarCupo();
-		hotel.liberarCupo();
+		hotel.liberarCupoConVenta();
 		verify(cupoHotel, times(1)).quitarCupoReservado();
 		
-		assertEquals(hotel.getCuposTotales(), 20);
-		assertEquals(hotel.getCuposLibres(), 10);
-		assertEquals(hotel.getCuposReservados(), 10);
+		assertEquals(20, hotel.getCuposTotales());
+		assertEquals(10, hotel.getCuposLibres());
+		assertEquals(10, hotel.getCuposReservados());
 		
 		assertTrue(hotel.sePuedeReservarCupo());
 		assertFalse(hotel.sePuedeQuitarCupo());
@@ -93,22 +104,54 @@ class TestServicios {
 	
 	@Test
 	void testPrecios() {
-		assertEquals(hotel.precioBaseCalculado(), 1000.0);
-		assertEquals(hotel.getPrecioFinal(), 1000.0);
+		assertEquals(1000.0, hotel.precioBaseCalculado());
+		assertEquals(1000.0, hotel.getPrecioFinal());
 		
-		assertEquals(hotelConAtributoDinamicoNoValido.precioBaseCalculado(), 1000.0);
-		assertEquals(hotelConAtributoDinamicoNoValido.getPrecioFinal(), 500.0);
+		assertEquals(1000.0, hotelConAtributoDinamicoNoValido.precioBaseCalculado());
+		assertEquals(500.0, hotelConAtributoDinamicoNoValido.getPrecioFinal());
 	}
 
 	@Test
 	void testGets() {
 		
-		assertEquals(hotel.getFechaCupoDelServicio(), LocalDate.of(2026,2,2));
+		assertEquals(LocalDate.of(2026,2,2), hotel.getFecha());
 		
 		assertEquals(hotel.getNombre(), "Noche de Hotel Central");
 		
 		assertEquals(hotel.getDescripcion(), "Un viaje para recordar");
+			
+		assertEquals(Categoria.ALOJAMIENTO, hotel.getCategoria());
 		
+		assertEquals("Hoteles SA", hotel.getProveedor());
+	}
+	
+	@Test
+	void verificacionDeCategoria () {
+		assertTrue(hotel.esDeCategoria(Categoria.ALOJAMIENTO));
+		
+		assertFalse(hotel.esDeCategoria(Categoria.EXCURSION));
+	}
+	
+	@Test
+	void testVentas() {
+		assertEquals(0, hotel.getVentas());
+		
+		hotel.decrementarCupoConVenta();
+		
+		assertEquals(1, hotel.getVentas());
+		
+		hotel.decrementarCupoSinVenta();
+		
+		assertEquals(1, hotel.getVentas());
+		
+		hotel.liberarCupoSinVenta();
+		
+		assertEquals(1, hotel.getVentas());
+
+		hotel.liberarCupoConVenta();
+		
+		assertEquals(0, hotel.getVentas());
+
 	}
 	
 }

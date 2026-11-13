@@ -1,5 +1,6 @@
 package catalogo;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface Catalogo {
@@ -10,9 +11,13 @@ public interface Catalogo {
 	
 	public Double precioBaseCalculado();
 	
-	public void decrementarCupo();
+	public void decrementarCupoSinVenta();
 	
-	public void liberarCupo();
+	public void decrementarCupoConVenta();
+	
+	public void liberarCupoSinVenta();
+	
+	public void liberarCupoConVenta();
 	
 	public List<Catalogo> buscarA (CriterioBusqueda criterio);
 
@@ -27,5 +32,13 @@ public interface Catalogo {
 	public boolean sePuedeReservarCupo();
 	
 	public boolean sePuedeQuitarCupo();
+	
+	public LocalDate getFecha();
+	
+	public String getProveedor();
+	
+	public int getVentas();
+	
+	public boolean esDeCategoria(Categoria categoria);
 
 }

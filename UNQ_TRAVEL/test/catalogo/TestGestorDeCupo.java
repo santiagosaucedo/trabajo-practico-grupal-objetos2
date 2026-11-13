@@ -25,17 +25,19 @@ class TestGestorDeCupo {
 	
 	@Test
 	void testeoDeGestorDeCupo() {
-		assertEquals(gestor.getCuposTotales(), 1);
-		assertEquals(gestor.getFecha(),LocalDate.of(2004, 2, 7));
-		assertEquals(gestor.getCuposReservados(), 0);
+		assertEquals(1, gestor.getCuposTotales());
+		assertEquals(LocalDate.of(2004, 2, 7), gestor.getFecha());
+		assertEquals(0 , gestor.getCuposReservados());
 		assertTrue(gestor.hayCuposDisponibles());
 		assertThrows(RuntimeException.class, () -> gestor.quitarCupoReservado());
 		gestor.reservarCupo();
 		assertFalse(gestor.hayCuposDisponibles());
-		assertEquals(gestor.getCuposLibres(), 0);
-		assertEquals(gestor.getCuposReservados(), 1);
+		assertEquals(0, gestor.getCuposLibres());
+		assertEquals(1, gestor.getCuposReservados());
 		assertThrows(RuntimeException.class, () -> gestor.reservarCupo());
 		gestor.quitarCupoReservado();
+		assertEquals(0, gestor.getCuposReservados());
+		assertEquals(1, gestor.getCuposLibres());
 		
 	}
 	

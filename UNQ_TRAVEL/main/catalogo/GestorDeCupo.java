@@ -1,7 +1,6 @@
 package catalogo;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public class GestorDeCupo {
 

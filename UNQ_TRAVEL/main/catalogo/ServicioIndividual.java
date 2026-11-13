@@ -2,12 +2,13 @@ package catalogo;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class ServicioIndividual implements Catalogo{
 
 	private String id;
+	
+	private int ventas;
 	
 	private String nombre;
 	
@@ -28,6 +29,9 @@ public class ServicioIndividual implements Catalogo{
 	public ServicioIndividual(String id, String nombre, String proveedor, String descripcion, Double precioBase,
 			List<AtributoDinamico> atributosAdicionales, GestorDeCupo cupo, Categoria categoria, Double descuento) {
 		
+		if(descuento > 100 || descuento < 0) {
+		throw new RuntimeException ("No es un porcentaje valido");
+		}
 		this.id = id;
 		this.nombre = nombre;
 		this.proveedor = proveedor;
@@ -80,12 +84,22 @@ public class ServicioIndividual implements Catalogo{
 		return precioBase;
 	}
 	
-	public void decrementarCupo() {
+	public void decrementarCupoSinVenta() {
 		cupo.reservarCupo();
 	}
 	
-	public void liberarCupo() {
+	public void decrementarCupoConVenta() {
+		this.decrementarCupoSinVenta();
+		ventas = ventas + 1;
+	}
+	
+	public void liberarCupoSinVenta() {
 		cupo.quitarCupoReservado();
+	}
+	
+	public void liberarCupoConVenta() {
+		this.liberarCupoSinVenta();
+		ventas = ventas - 1;
 	}
 	
 	public List<Catalogo> buscarA(CriterioBusqueda criterio){ //PENDIENTE
@@ -96,10 +110,9 @@ public class ServicioIndividual implements Catalogo{
 		return precioBase - ((precioBase * descuento) / 100);
 	}
 	
-	public LocalDate getFechaCupoDelServicio() {
+	public LocalDate getFecha() {
 		return cupo.getFecha();
 	}
-
 	
 	public int getCuposTotales() {
 		return cupo.getCuposTotales();
@@ -121,5 +134,22 @@ public class ServicioIndividual implements Catalogo{
 	public boolean sePuedeReservarCupo() {
 		return cupo.sePuedeReservarCupo();
 	}
+
+	public String getProveedor() {
+		return proveedor;
+	}
 	
+	public Categoria getCategoria() {
+		return categoria;
+	}
+
+	public int getVentas() {
+		return ventas;
+	}
+
+	@Override
+	public boolean esDeCategoria(Categoria categoria) {
+		return this.categoria == categoria;
+	}
+
 }
