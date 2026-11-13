@@ -1,9 +1,11 @@
 package Reservas;
 
 import java.util.ArrayList;
-
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import org.mockito.ArgumentMatchers;
 
 import catalogo.Catalogo;
 import NotificadoresYDocumentos.ObservadorReserva.ObservadorReserva;
@@ -80,4 +82,18 @@ public class Reserva {
 	public Optional<EstadoDeReserva> getEstadoAnterior() {
 		return Optional.ofNullable(estadoAnterior);
 	}
+
+	public List<Catalogo> getServicios() {
+		
+		return Collections.unmodifiableList(servicios);
+	}
+	
+	public void incorporarServicio(Catalogo servicio) {
+	    servicios.add(servicio);
+	}
+
+	public void retirarServicio(Catalogo servicio) {
+	    servicios.remove(servicio);
+	}
 }
+ 

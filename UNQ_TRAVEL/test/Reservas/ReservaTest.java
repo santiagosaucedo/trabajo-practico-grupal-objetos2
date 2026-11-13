@@ -13,15 +13,19 @@ import Reservas.EstadosDeReserva.EstadoCancelado;
 import Reservas.EstadosDeReserva.EstadoDeReserva;
 import Reservas.EstadosDeReserva.EstadoFinalizado;
 import Traslado.Traslado;
+import catalogo.Catalogo;
 
 class ReservaTest {
 
 	private Reserva reserva; // atributo del test, no variable local
 	private ObservadorReserva observador;
+	private Catalogo servicio;
+	
 
 	@BeforeEach
 	void setUp() {
 		reserva = new Reserva(new ArrayList<>(), "pepito@gmail.com", mock(Traslado.class));
+		servicio = mock(Catalogo.class);
 		observador = mock(ObservadorReserva.class);
 		reserva.agregarObservador(observador);
 
@@ -76,6 +80,42 @@ class ReservaTest {
 		//assert
 		
 		assertSame(estadoInicial, reserva.getEstadoAnterior().get());
+	}
+	
+	@Test
+	void enPendienteSePuedeAgregarUnServicio() {
+	   
+
+	    reserva.agregarServicio(servicio);
+
+	    assertTrue(reserva.getServicios().contains(servicio));
+	}
+
+	@Test
+	void enPendienteSePuedeQuitarUnServicio() {
+	    
+	    reserva.agregarServicio(servicio);
+
+	    reserva.quitarServicio(servicio);
+
+	    assertFalse(reserva.getServicios().contains(servicio));
+	}
+
+	@Test
+	void noSePuedeAgregarUnServicioEnEstadoCancelado() {
+	    
+	    reserva.cambiarA(new EstadoCancelado());
+
+	    assertThrows(OperacionInvalidaException.class,
+	                 () -> reserva.agregarServicio(servicio));
+	}
+
+	@Test
+	void losServiciosQueDevuelveLaReservaNoSePuedenModificarDesdeAfuera() {
+	    
+
+	    assertThrows(UnsupportedOperationException.class,
+	                 () -> reserva.getServicios().add(servicio));
 	}
 
 }
