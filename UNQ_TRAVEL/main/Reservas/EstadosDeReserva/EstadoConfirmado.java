@@ -10,4 +10,10 @@ public class EstadoConfirmado extends EstadoDeReserva {
 	public void notificarA(ObservadorReserva observador, Reserva reserva) {
 	    observador.reservaConfirmada(reserva);
 	}
+	
+	@Override 
+	public void realizarCheking(Reserva unaReserva) {
+		
+		unaReserva.cambiarA(new EstadoCheking());
+	}
 }

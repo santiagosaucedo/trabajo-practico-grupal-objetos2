@@ -10,8 +10,10 @@ import org.junit.jupiter.api.Test;
 
 import NotificadoresYDocumentos.ObservadorReserva.ObservadorReserva;
 import Reservas.EstadosDeReserva.EstadoCancelado;
+import Reservas.EstadosDeReserva.EstadoCheking;
 import Reservas.EstadosDeReserva.EstadoConfirmado;
 import Reservas.EstadosDeReserva.EstadoDeReserva;
+import Reservas.EstadosDeReserva.EstadoEnCurso;
 import Reservas.EstadosDeReserva.EstadoFinalizado;
 import Reservas.EstadosDeReserva.EstadoPendiente;
 import Traslado.Traslado;
@@ -177,6 +179,108 @@ class ReservaTest {
 	    reserva.confirmar();
 
 	    assertThrows(OperacionInvalidaException.class, () -> reserva.confirmar());
+	}
+	
+	@Test
+	void desdeConfirmadoSePuedeRealizarElCheckin() {
+		
+		reserva.cambiarA(new EstadoConfirmado());
+	    
+	    reserva.realizarCheckin();
+
+	    assertInstanceOf(EstadoCheking.class, reserva.getEstado());
+	    verify(observador).checkingRealizado(reserva);
+	}
+	
+	@Test
+	void desdeEnCursoSePuedeFinalizarElviaje() {
+		
+		reserva.cambiarA(new EstadoEnCurso());
+	    
+	    reserva.finalizarViaje();
+
+	    assertInstanceOf(EstadoFinalizado.class, reserva.getEstado());
+	    verify(observador).reservaFinalizada(reserva);
+	}
+	
+	@Test
+	void unaReservaFinalizadaNoPermiteNingunaOperacion() {
+	    reserva.cambiarA(new EstadoFinalizado());
+
+	    assertAll(
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.confirmar()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.realizarCheckin()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.comenzarViaje()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.finalizarViaje()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.agregarServicio(servicio)),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.quitarServicio(servicio))
+	    );
+	}
+	
+	@Test
+	void unaReservaCanceladaNoPermiteNingunaOperacion() {
+	    reserva.cambiarA(new EstadoCancelado());
+
+	    assertAll(
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.confirmar()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.realizarCheckin()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.comenzarViaje()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.finalizarViaje()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.agregarServicio(servicio)),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.quitarServicio(servicio)),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.cancelar())
+	    );
+	}
+	
+	@Test
+	void unaReservaConfirmadaNoPermiteOperacionesInvalidas() {
+	    reserva.cambiarA(new EstadoConfirmado());
+
+	    assertAll(
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.confirmar()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.comenzarViaje()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.finalizarViaje()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.agregarServicio(servicio)),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.quitarServicio(servicio))
+	    );
+	}
+	
+	@Test
+	void unaReservaEnChekingNoPermiteOperacionesInvalidas() {
+	    reserva.cambiarA(new EstadoCheking());
+
+	    assertAll(
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.confirmar()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.realizarCheckin()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.finalizarViaje()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.agregarServicio(servicio)),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.quitarServicio(servicio))
+	    );
+	}
+	
+	@Test
+	void unaReservaEnCursoNoPermiteOperacionesInvalidas() {
+	    reserva.cambiarA(new EstadoEnCurso());
+
+	    assertAll(
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.confirmar()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.realizarCheckin()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.comenzarViaje()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.agregarServicio(servicio)),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.quitarServicio(servicio))
+	    );
+	}
+	
+	@Test
+	void unaReservaPendienteNoPermiteOperacionesInvalidas() {
+	    reserva.cambiarA(new EstadoPendiente());
+
+	    assertAll(
+	       
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.realizarCheckin()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.comenzarViaje()),
+	    	() -> assertThrows(OperacionInvalidaException.class, () -> reserva.finalizarViaje())
+	    );
 	}
 
 }

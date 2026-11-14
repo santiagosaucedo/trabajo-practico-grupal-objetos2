@@ -42,10 +42,7 @@ public class Reserva {
 
 	}
 
-	public void agregarServicio(Catalogo servicio) {
-
-		estado.agregarServicio(this, servicio);
-	}
+	
 
 	public void agregarObservador(ObservadorReserva observador) {
 
@@ -53,19 +50,36 @@ public class Reserva {
 
 	}
 
+	//La reserva (context) le delega todas estas responsabilidades al estadoDeReserva (State), respetando asi el patron al dejarle decidir a los distintos estados (concrete states) como proceder
+	
 	public void quitarServicio(Catalogo servicio) {
 
 		estado.quitarServicio(this, servicio);
+	}
+	
+	public void agregarServicio(Catalogo servicio) {
+
+		estado.agregarServicio(this, servicio);
 	}
 
 	public void confirmar() {
 
 		estado.confirmarReserva(this);
 	}
+	
+	public void comenzarViaje() {
+		
+		estado.comenzarViaje(this);
+	}
+	
+	public void finalizarViaje() {
+		
+		estado.finalizarViaje(this);
+	}
 
-	public void realizarRegistro() {
-		// llamar al del estado realizar rembolso el que lo tenga y que haga new
-		// voucherDeCredito
+	public void realizarCheckin() {
+		
+		estado.realizarCheking(this);
 	}
 
 	public EstadoDeReserva getEstado() {
@@ -94,6 +108,11 @@ public class Reserva {
 
 	public void retirarServicio(Catalogo servicio) {
 	    servicios.remove(servicio);
+	}
+
+	public void cancelar() {
+		
+		estado.cancelarReserva(this);
 	}
 }
  
