@@ -10,8 +10,10 @@ import org.junit.jupiter.api.Test;
 
 import NotificadoresYDocumentos.ObservadorReserva.ObservadorReserva;
 import Reservas.EstadosDeReserva.EstadoCancelado;
+import Reservas.EstadosDeReserva.EstadoConfirmado;
 import Reservas.EstadosDeReserva.EstadoDeReserva;
 import Reservas.EstadosDeReserva.EstadoFinalizado;
+import Reservas.EstadosDeReserva.EstadoPendiente;
 import Traslado.Traslado;
 import catalogo.Catalogo;
 
@@ -116,6 +118,65 @@ class ReservaTest {
 
 	    assertThrows(UnsupportedOperationException.class,
 	                 () -> reserva.getServicios().add(servicio));
+	}
+	
+	@Test
+	void confirmarConCupoBloqueaElCupoYPasaAConfirmado() {
+	    when(servicio.sePuedeReservarCupo()).thenReturn(true);
+	    reserva.agregarServicio(servicio);
+
+	    reserva.confirmar();
+
+	    verify(servicio).decrementarCupoConVenta();
+	    verify(servicio, never()).decrementarCupoSinVenta();
+	    assertInstanceOf(EstadoConfirmado.class, reserva.getEstado());
+	    verify(observador).reservaConfirmada(reserva);
+	}
+
+	@Test
+	void confirmarSinCupoLanzaExcepcionYNoBloqueaNada() {
+	    when(servicio.sePuedeReservarCupo()).thenReturn(false);
+	    reserva.agregarServicio(servicio);
+
+	    assertThrows(OperacionInvalidaException.class, () -> reserva.confirmar());
+
+	    verify(servicio, never()).decrementarCupoConVenta();
+	    assertInstanceOf(EstadoPendiente.class, reserva.getEstado());
+	}
+
+	@Test
+	void siUnServicioNoTieneCupoNingunoSeBloquea() {
+	    Catalogo sinCupo = mock(Catalogo.class);
+	    when(servicio.sePuedeReservarCupo()).thenReturn(true);
+	    when(sinCupo.sePuedeReservarCupo()).thenReturn(false);
+	    reserva.agregarServicio(servicio);
+	    reserva.agregarServicio(sinCupo);
+
+	    assertThrows(OperacionInvalidaException.class, () -> reserva.confirmar());
+
+	    verify(servicio, never()).decrementarCupoConVenta();
+	    verify(sinCupo, never()).decrementarCupoConVenta();
+	}
+
+	@Test
+	void noSePuedeConfirmarUnaReservaSinServicios() {
+	    assertTrue(reserva.getServicios().isEmpty());
+
+	    OperacionInvalidaException error = assertThrows(OperacionInvalidaException.class,
+	            () -> reserva.confirmar());
+
+	    assertEquals("La reserva no tiene servicios", error.getMessage());
+	    assertInstanceOf(EstadoPendiente.class, reserva.getEstado());
+	}
+	
+
+	@Test
+	void noSePuedeConfirmarDosVeces() {
+	    when(servicio.sePuedeReservarCupo()).thenReturn(true);
+	    reserva.agregarServicio(servicio);
+	    reserva.confirmar();
+
+	    assertThrows(OperacionInvalidaException.class, () -> reserva.confirmar());
 	}
 
 }
