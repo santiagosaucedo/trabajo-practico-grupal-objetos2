@@ -9,4 +9,10 @@ public class EstadoCheking extends EstadoDeReserva {
 	public void notificarA(ObservadorReserva observador, Reserva reserva) {
 	    observador.checkingRealizado(reserva);
 	}
+	
+	@Override
+	public void comenzarViaje(Reserva unaReserva) {
+
+	    unaReserva.cambiarA(new EstadoEnCurso());
+	}
 }

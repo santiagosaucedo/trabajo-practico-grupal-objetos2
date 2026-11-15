@@ -21,6 +21,7 @@ public class EstadoConfirmado extends EstadoDeReserva {
 	public void cancelarReserva(Reserva unaReserva) {
 		
 		unaReserva.liberarCupoDeServicios();
+		unaReserva.reembolsarServiciosYTasas();
 		unaReserva.cambiarA(new EstadoCancelado());
 		
 	}

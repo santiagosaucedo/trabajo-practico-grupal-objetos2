@@ -24,15 +24,16 @@ class ReservaTest {
 	private Reserva reserva; // atributo del test, no variable local
 	private ObservadorReserva observador;
 	private Catalogo servicio;
+	private Traslado traslado;
 	
 
 	@BeforeEach
 	void setUp() {
-		reserva = new Reserva(new ArrayList<>(), "pepito@gmail.com", mock(Traslado.class));
 		servicio = mock(Catalogo.class);
 		observador = mock(ObservadorReserva.class);
+		traslado = mock(Traslado.class);
+		reserva = new Reserva(new ArrayList<>(), "juancito@gmail.com", traslado);
 		reserva.agregarObservador(observador);
-
 	}
 
 	@Test
@@ -213,7 +214,9 @@ class ReservaTest {
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.comenzarViaje()),
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.finalizarViaje()),
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.agregarServicio(servicio)),
-	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.quitarServicio(servicio))
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.quitarServicio(servicio)),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.cancelar())
+	        
 	    );
 	}
 	
@@ -339,6 +342,43 @@ class ReservaTest {
 	    reserva.agregarServicio(otroServicio);
 
 	    assertEquals(1500.0, reserva.calcularCostoDeServicios(), 0.001);
+	}
+	
+	@Test
+	void cancelarDesdeConfirmadoReembolsaServiciosYTasas() {
+	    Catalogo otroServicio = mock(Catalogo.class);
+	    when(servicio.getPrecioFinal()).thenReturn(1000.0);
+	    when(otroServicio.getPrecioFinal()).thenReturn(500.0);
+	    when(traslado.calcularCosto(1500.0)).thenReturn(200.0);
+	    reserva.agregarServicio(servicio);
+	    reserva.agregarServicio(otroServicio);
+	    reserva.cambiarA(new EstadoConfirmado());
+
+	    reserva.cancelar();
+	    
+	    assertEquals(1700.0, reserva.montoTotalDelHistorialDeVouchers(), 0.001);
+	    
+	}
+	
+	@Test
+	void desdeChekingSePuedeComenzarElViaje() {
+	    reserva.cambiarA(new EstadoCheking());
+
+	    reserva.comenzarViaje();
+
+	    assertInstanceOf(EstadoEnCurso.class, reserva.getEstado());
+	    verify(observador).viajeComenzado(reserva);
+	}
+
+	@Test
+	void cancelarDesdePendienteNoReembolsaNada() {
+	    when(servicio.getPrecioFinal()).thenReturn(1000.0);
+	    when(traslado.calcularCosto(1000.0)).thenReturn(200.0);
+	    reserva.agregarServicio(servicio);
+
+	    reserva.cancelar();
+
+	    assertEquals(0.0, reserva.montoTotalDelHistorialDeVouchers(), 0.001);
 	}
 
 }

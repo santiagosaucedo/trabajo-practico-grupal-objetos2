@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import org.mockito.ArgumentMatchers;
-
 import catalogo.Catalogo;
 import NotificadoresYDocumentos.ObservadorReserva.ObservadorReserva;
 import NotificadoresYDocumentos.Vouchers.Documentos.RegistroDocumentos;
+import NotificadoresYDocumentos.Vouchers.Documentos.VoucherDeCredito;
 import Reservas.EstadosDeReserva.EstadoDeReserva;
 import Traslado.Traslado;
 import Reservas.EstadosDeReserva.EstadoPendiente;
@@ -23,6 +21,7 @@ public class Reserva {
 	private Traslado metodoDeTraslado;
 	private RegistroDocumentos historialVouchers;
 	private EstadoDeReserva estadoAnterior;
+	private int contadorDeId = 1;
 
 	public Reserva(List<Catalogo> servicios, String direccionMailCliente, Traslado metodoDeTraslado) {
 
@@ -120,6 +119,24 @@ public class Reserva {
 		
 		getServicios().forEach(servicio -> servicio.liberarCupoConVenta());
 		
+	}
+	
+	private void registrarReembolso(double monto) {
+		
+		historialVouchers.guardarDocumento(new VoucherDeCredito(contadorDeId++, monto));
+		
+	}
+	
+	public double montoTotalDelHistorialDeVouchers() {
+		
+		return historialVouchers.montoTotal();
+	}
+
+	public void reembolsarServiciosYTasas() {
+		
+		double costoServicio = this.calcularCostoDeServicios();  
+		double tasas = this.metodoDeTraslado.calcularCosto(costoServicio);
+		this.registrarReembolso(costoServicio + tasas);
 	}
 }
  
