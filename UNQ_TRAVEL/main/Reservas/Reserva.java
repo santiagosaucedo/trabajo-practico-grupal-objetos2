@@ -172,5 +172,12 @@ public class Reserva {
 	}
 	
 	
+
+	public String getDireccionMailCliente() {
+		
+		return direccionMailCliente;
+	}
+	
+	
 }
  
