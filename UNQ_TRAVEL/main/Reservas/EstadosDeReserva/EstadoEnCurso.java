@@ -25,6 +25,15 @@ public class EstadoEnCurso extends EstadoDeReserva {
 		
 	}
 	
+	@Override 
+	public void cancelarReserva(Reserva unaReserva) {
+		
+		unaReserva.reembolsarServiciosNoDisfrutados();
+		unaReserva.cambiarA(new EstadoCancelado());
+		
+	}
+	
+	
 	private void validarPasarAlSiguienteServicio(Reserva unaReserva) {
 		
 		if(unaReserva.getServiciosDisfrutados() >= unaReserva.cantidadDeServicios()) {

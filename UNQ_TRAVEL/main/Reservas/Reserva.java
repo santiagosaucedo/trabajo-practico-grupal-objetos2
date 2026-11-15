@@ -162,6 +162,15 @@ public class Reserva {
 		return servicios.size();
 	}
 	
+	public void reembolsarServiciosNoDisfrutados() {
+		
+		double totalServiciosNoDisfrutados= servicios.stream().skip(contadorServiciosDisfrutados)
+		.mapToDouble(Catalogo::getPrecioFinal)
+        .sum();
+		this.registrarReembolso(totalServiciosNoDisfrutados);
+		
+	}
+	
 	
 }
  
