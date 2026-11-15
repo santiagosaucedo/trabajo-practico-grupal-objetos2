@@ -215,6 +215,7 @@ class ReservaTest {
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.finalizarViaje()),
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.agregarServicio(servicio)),
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.quitarServicio(servicio)),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.pasarAlSiguienteServicio()),
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.cancelar())
 	        
 	    );
@@ -231,6 +232,7 @@ class ReservaTest {
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.finalizarViaje()),
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.agregarServicio(servicio)),
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.quitarServicio(servicio)),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.pasarAlSiguienteServicio()),
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.cancelar())
 	    );
 	}
@@ -244,6 +246,7 @@ class ReservaTest {
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.comenzarViaje()),
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.finalizarViaje()),
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.agregarServicio(servicio)),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.pasarAlSiguienteServicio()),
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.quitarServicio(servicio))
 	    );
 	}
@@ -257,6 +260,7 @@ class ReservaTest {
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.realizarCheckin()),
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.finalizarViaje()),
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.agregarServicio(servicio)),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.pasarAlSiguienteServicio()),
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.quitarServicio(servicio))
 	    );
 	}
@@ -282,6 +286,7 @@ class ReservaTest {
 	       
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.realizarCheckin()),
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.comenzarViaje()),
+	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.pasarAlSiguienteServicio()),
 	    	() -> assertThrows(OperacionInvalidaException.class, () -> reserva.finalizarViaje())
 	    );
 	}
@@ -417,5 +422,33 @@ class ReservaTest {
 	    assertEquals(1700.0, reserva.montoTotalDelHistorialDeVouchers(), 0.001);
 	    
 	}
+	
+	@Test
+	void pasarAlSiguienteServicioAumentaElContador() {
+		
+		//arrange
+		reserva.agregarServicio(servicio);
+		Catalogo otroServicio = mock(Catalogo.class);
+		reserva.agregarServicio(otroServicio);
+		reserva.cambiarA(new EstadoEnCurso());
+		
+		reserva.pasarAlSiguienteServicio();
+		assertEquals(1, reserva.getServiciosDisfrutados());
+		
+	}
+	
+	@Test
+	void pasarAlSiguienteServicioSinSiguienteServicioLanzaExcepcion() {
+		
+		//arrange
+		reserva.agregarServicio(servicio); //tiene 1 servicio
+		reserva.cambiarA(new EstadoEnCurso());
+		reserva.pasarAlSiguienteServicio(); //tiene 0
+		
+		assertThrows(OperacionInvalidaException.class, () -> reserva.pasarAlSiguienteServicio());
+		assertEquals(1, reserva.getServiciosDisfrutados());
+	}
+	
+	
 
 }

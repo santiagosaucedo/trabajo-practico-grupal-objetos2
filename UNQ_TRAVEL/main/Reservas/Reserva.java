@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
 import catalogo.Catalogo;
 import NotificadoresYDocumentos.ObservadorReserva.ObservadorReserva;
 import NotificadoresYDocumentos.Vouchers.Documentos.RegistroDocumentos;
@@ -22,6 +23,7 @@ public class Reserva {
 	private RegistroDocumentos historialVouchers;
 	private EstadoDeReserva estadoAnterior;
 	private int contadorDeId = 1;
+	private int contadorServiciosDisfrutados = 0; //se consumen en orden de lista
 
 	public Reserva(List<Catalogo> servicios, String direccionMailCliente, Traslado metodoDeTraslado) {
 
@@ -79,6 +81,12 @@ public class Reserva {
 	public void realizarCheckin() {
 		
 		estado.realizarCheking(this);
+	}
+	
+	public void pasarAlSiguienteServicio() {
+		
+		estado.pasarAlSiguienteServicio(this);
+		
 	}
 
 	public EstadoDeReserva getEstado() {
@@ -138,5 +146,22 @@ public class Reserva {
 		double tasas = this.metodoDeTraslado.calcularCosto(costoServicio);
 		this.registrarReembolso(costoServicio + tasas);
 	}
+
+	public int  getServiciosDisfrutados() {
+		
+		return contadorServiciosDisfrutados;
+	}
+	
+	public void registrarServicioDisfrutado() {
+		
+		contadorServiciosDisfrutados++;
+	}
+
+	public int cantidadDeServicios() {
+		
+		return servicios.size();
+	}
+	
+	
 }
  

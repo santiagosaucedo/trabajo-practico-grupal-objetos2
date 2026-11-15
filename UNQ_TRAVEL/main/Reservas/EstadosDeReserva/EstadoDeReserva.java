@@ -43,4 +43,10 @@ public abstract class EstadoDeReserva {
 		
 		throw new OperacionInvalidaException("No se puede cancelar la reserva en este estado");
 	}
+	
+	public void pasarAlSiguienteServicio(Reserva unaReserva) {
+		
+		throw new OperacionInvalidaException("No se puede pasar al siguiente servicio en este estado");
+		
+	}
 }
