@@ -273,7 +273,7 @@ class ReservaTest {
 	
 	@Test
 	void unaReservaPendienteNoPermiteOperacionesInvalidas() {
-	    reserva.cambiarA(new EstadoPendiente());
+	    
 
 	    assertAll(
 	       
@@ -281,6 +281,64 @@ class ReservaTest {
 	        () -> assertThrows(OperacionInvalidaException.class, () -> reserva.comenzarViaje()),
 	    	() -> assertThrows(OperacionInvalidaException.class, () -> reserva.finalizarViaje())
 	    );
+	}
+	
+	@Test
+	void cancelarDesdePendientePasaACanceladoYAvisaAlObservador() {
+	    reserva.cancelar();
+
+	    assertInstanceOf(EstadoCancelado.class, reserva.getEstado());
+	    verify(observador).reservaCancelada(reserva);
+	}
+
+	@Test
+	void cancelarDesdePendienteNoAfectaAlCupo() {
+	    reserva.agregarServicio(servicio);
+
+	    reserva.cancelar();
+
+	    verify(servicio, never()).liberarCupoConVenta();
+	    verify(servicio, never()).decrementarCupoConVenta();
+	}
+	
+	@Test
+	void cancelarDesdeConfirmadoPasaACanceladoYAvisaAlObservador() {
+	    reserva.cambiarA(new EstadoConfirmado());
+
+	    reserva.cancelar();
+	    
+	    assertInstanceOf(EstadoCancelado.class, reserva.getEstado());
+	    verify(observador).reservaCancelada(reserva);
+	    
+	}
+
+	@Test
+	void cancelarDesdeConfirmadoLiberaElCupoDeLosServicios() {
+	    reserva.agregarServicio(servicio);
+	    reserva.cambiarA(new EstadoConfirmado());
+
+	    reserva.cancelar();
+
+	    verify(servicio).liberarCupoConVenta();
+	    verify(servicio, never()).decrementarCupoConVenta();
+	}
+	
+	@Test
+	void unaReservaSinServiciosCuestaCero() {
+	    assertEquals(0.0, reserva.calcularCostoDeServicios(), 0.001);
+	}
+
+	@Test
+	void elCostoDeLosServiciosEsLaSumaDeSusPreciosFinales() {
+	    Catalogo otroServicio = mock(Catalogo.class);
+	    
+	    when(servicio.getPrecioFinal()).thenReturn(1000.0);
+	    when(otroServicio.getPrecioFinal()).thenReturn(500.0);
+	    
+	    reserva.agregarServicio(servicio);
+	    reserva.agregarServicio(otroServicio);
+
+	    assertEquals(1500.0, reserva.calcularCostoDeServicios(), 0.001);
 	}
 
 }

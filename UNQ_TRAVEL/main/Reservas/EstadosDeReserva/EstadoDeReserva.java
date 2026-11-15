@@ -39,7 +39,7 @@ public abstract class EstadoDeReserva {
 		throw new OperacionInvalidaException("No se puede terminar el viaje en este estado");
 	}
 
-	public void cancelarReserva(Reserva UnaReserva) {
+	public void cancelarReserva(Reserva unaReserva) {
 		
 		throw new OperacionInvalidaException("No se puede cancelar la reserva en este estado");
 	}

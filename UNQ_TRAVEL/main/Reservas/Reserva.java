@@ -89,8 +89,9 @@ public class Reserva {
 
 	public double calcularCostoDeServicios() {
 
-		return 0;
-
+		return servicios.stream()
+                .mapToDouble(Catalogo::getPrecioFinal)
+                .sum();
 	}
 
 	public Optional<EstadoDeReserva> getEstadoAnterior() {
@@ -113,6 +114,12 @@ public class Reserva {
 	public void cancelar() {
 		
 		estado.cancelarReserva(this);
+	}
+	
+	public void liberarCupoDeServicios() {
+		
+		getServicios().forEach(servicio -> servicio.liberarCupoConVenta());
+		
 	}
 }
  

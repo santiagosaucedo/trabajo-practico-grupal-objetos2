@@ -1,5 +1,5 @@
 package Reservas.EstadosDeReserva;
-import java.util.stream.Stream;
+
 
 import Reservas.OperacionInvalidaException;
 import Reservas.Reserva;
@@ -52,6 +52,12 @@ public class EstadoPendiente extends EstadoDeReserva  {
 				  });
 		
 	}
-	 
+	
+	@Override
+	public void cancelarReserva(Reserva unaReserva) {
+		
+		unaReserva.cambiarA(new EstadoCancelado());
+		
+	}
 }
 

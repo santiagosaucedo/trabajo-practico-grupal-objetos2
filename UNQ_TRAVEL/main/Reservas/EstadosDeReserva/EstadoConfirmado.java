@@ -16,4 +16,12 @@ public class EstadoConfirmado extends EstadoDeReserva {
 		
 		unaReserva.cambiarA(new EstadoCheking());
 	}
+	
+	@Override
+	public void cancelarReserva(Reserva unaReserva) {
+		
+		unaReserva.liberarCupoDeServicios();
+		unaReserva.cambiarA(new EstadoCancelado());
+		
+	}
 }
