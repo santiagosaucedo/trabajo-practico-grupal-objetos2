@@ -15,4 +15,13 @@ public class EstadoCheking extends EstadoDeReserva {
 
 	    unaReserva.cambiarA(new EstadoEnCurso());
 	}
+	
+	@Override
+	public void cancelarReserva(Reserva unaReserva) {
+		
+		unaReserva.liberarCupoDeServicios();
+		unaReserva.reembolsarServiciosYTasas();
+		unaReserva.cambiarA(new EstadoCancelado());
+		
+	}
 }

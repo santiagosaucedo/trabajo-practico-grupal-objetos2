@@ -380,5 +380,42 @@ class ReservaTest {
 
 	    assertEquals(0.0, reserva.montoTotalDelHistorialDeVouchers(), 0.001);
 	}
+	
+	@Test
+	void pasarDesdeChekingACanceladoAvisaAlObservador() {
+	    
+		reserva.cambiarA(new EstadoCheking());
+		reserva.cancelar();
+
+	    assertInstanceOf(EstadoCancelado.class, reserva.getEstado());
+	    verify(observador).reservaCancelada(reserva);
+	}
+	
+	@Test
+	void cancelarDesdeChekingLiberaElCupoDeLosServicios() {
+	    reserva.agregarServicio(servicio);
+	    reserva.cambiarA(new EstadoCheking());
+
+	    reserva.cancelar();
+
+	    verify(servicio).liberarCupoConVenta();
+	    verify(servicio, never()).decrementarCupoConVenta();
+	}
+	
+	@Test
+	void cancelarDesdeChekingReembolsaServiciosYTasas() {
+	    Catalogo otroServicio = mock(Catalogo.class);
+	    when(servicio.getPrecioFinal()).thenReturn(1000.0);
+	    when(otroServicio.getPrecioFinal()).thenReturn(500.0);
+	    when(traslado.calcularCosto(1500.0)).thenReturn(200.0);
+	    reserva.agregarServicio(servicio);
+	    reserva.agregarServicio(otroServicio);
+	    reserva.cambiarA(new EstadoCheking());
+
+	    reserva.cancelar();
+	    
+	    assertEquals(1700.0, reserva.montoTotalDelHistorialDeVouchers(), 0.001);
+	    
+	}
 
 }
