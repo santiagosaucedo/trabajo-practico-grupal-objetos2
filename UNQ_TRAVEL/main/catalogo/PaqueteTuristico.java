@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import Busqueda.CriterioBusqueda;
+
 
 //Un paquete no puede tenerse a si mismo dentro ni admitir catalogos duplicados. 
 //Es decir, dos mismas estancias de un elemento no pueden existir en una lista de paquetes.
@@ -94,9 +96,13 @@ public class PaqueteTuristico implements Catalogo {
 	}
 
 	@Override
-	public List<Catalogo> buscarA(CriterioBusqueda criterio) { // PENDIENTE
-		// TODO Auto-generated method stub
-		return null;
+	public List<Catalogo> buscarA(CriterioBusqueda criterio) {
+	    List<Catalogo> encontrados = new ArrayList<>();
+	    if (criterio.cumple(this)) {
+	        encontrados.add(this);
+	    }
+	    contenido.forEach(item -> encontrados.addAll(item.buscarA(criterio)));
+	    return encontrados;
 	}
 
 	@Override

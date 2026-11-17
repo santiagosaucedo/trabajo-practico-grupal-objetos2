@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import Busqueda.CriterioBusqueda;
+
 public class ServicioIndividual implements Catalogo{
 
 	private String id;
@@ -102,8 +104,12 @@ public class ServicioIndividual implements Catalogo{
 		ventas = ventas - 1;
 	}
 	
-	public List<Catalogo> buscarA(CriterioBusqueda criterio){ //PENDIENTE
-		return new ArrayList<>();
+	@Override
+	public List<Catalogo> buscarA(CriterioBusqueda criterio) {
+	    if (criterio.cumple(this)) {
+	        return List.of(this);
+	    }
+	    return List.of();
 	}
 	
 	public Double getPrecioFinal() {

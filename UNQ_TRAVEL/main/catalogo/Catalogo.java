@@ -3,6 +3,8 @@ package catalogo;
 import java.time.LocalDate;
 import java.util.List;
 
+import Busqueda.CriterioBusqueda;
+
 public interface Catalogo {
 
 	public String getNombre();
